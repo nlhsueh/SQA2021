@@ -1,0 +1,57 @@
+apply plugin: 'java'
+apply plugin: "jacoco"
+// apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+
+
+javadoc.options.encoding = 'UTF-8'
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+jacoco {
+    toolVersion = "0.8.1"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.5
+            }
+        }
+
+        rule {
+            enabled = false
+            element = 'CLASS'
+            includes = ['java.com.*']
+
+            limit {
+                counter = 'LINE'
+                value = 'TOTALCOUNT'
+                maximum = 0.3
+            }
+        }
+    }
+}
+
+dependencies {
+    compile 'commons-codec:commons-codec:1.8'
+    testCompile 'junit:junit:4.+'
+}
+
+task run(type: JavaExec) {
+    main = 'com.example.Main'
+    classpath = configurations.compile + sourceSets.main.output
+}
